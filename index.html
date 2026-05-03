@@ -103,7 +103,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .quick-btn {
@@ -124,18 +124,74 @@
             border-color: var(--primary-color);
         }
 
+        .or-divider {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 35%;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .or-divider::before {
+            left: 0;
+        }
+
+        .or-divider::after {
+            right: 0;
+        }
+
         .custom-input-wrapper {
             margin-bottom: 25px;
+        }
+
+        .input-container {
+            position: relative;
         }
 
         input[type="number"] {
             width: 100%;
             padding: 18px;
+            padding-right: 50px;
             font-size: 1.4rem;
             border: 2px solid #ced4da;
             border-radius: 14px;
             outline: none;
             font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .clear-input-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #f1f3f5;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #495057;
+            font-size: 1.2rem;
+            line-height: 1;
         }
 
         .rate-info-box {
@@ -154,7 +210,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .results-display {
@@ -213,7 +269,6 @@
             transform: scale(0.98);
         }
 
-        /* History Table Styles */
         .history-card {
             overflow-x: auto;
         }
@@ -295,6 +350,7 @@
                     oninput="updateArea(this.value)" onblur="this.style.display='none'">
             </header>
 
+            <!-- Price Section -->
             <span class="section-label">၁ ပေ ပတ်လည် ဈေးနှုန်း ရွေးရန်</span>
             <div class="quick-grid">
                 <button class="quick-btn" onclick="setQuickPrice(400000, this)">၄ သိန်း</button>
@@ -303,24 +359,41 @@
                 <button class="quick-btn" onclick="setQuickPrice(1000000, this)">၁၀ သိန်း</button>
             </div>
 
+            <div class="or-divider">သို့မဟုတ်</div>
+
             <div class="custom-input-wrapper">
                 <span class="section-label">ကိုယ်တိုင်ရိုက်ထည့်ရန်</span>
-                <input type="number" id="priceInput" placeholder="ဥပမာ - ၄၅၀၀၀၀" inputmode="decimal"
-                    oninput="updateCalculation()">
+                <div class="input-container">
+                    <input type="number" id="priceInput" placeholder="ဈေးနှုန်းရိုက်ထည့်ပါ" inputmode="decimal"
+                        oninput="updateCalculation()">
+                    <button id="clearPriceBtn" class="clear-input-btn" onclick="clearPrice()">✕</button>
+                </div>
             </div>
 
+            <!-- Exchange Rate Section -->
             <span class="section-label">ငွေလဲနှုန်း (၁ ဒေါ်လာ)</span>
             <div class="rate-info-box" id="rateInfo">1 USD = ၄,၀၀၀ ကျပ်</div>
             <div class="rate-selector">
-                <button class="quick-btn active" onclick="setRate(4000, this)">၄၀၀၀</button>
-                <button class="quick-btn" onclick="setRate(4500, this)">၄၅၀၀</button>
-                <button class="quick-btn" onclick="setRate(5000, this)">၅၀၀၀</button>
+                <button class="quick-btn active" onclick="setQuickRate(4000, this)">၄၀၀၀</button>
+                <button class="quick-btn" onclick="setQuickRate(4500, this)">၄၅၀၀</button>
+                <button class="quick-btn" onclick="setQuickRate(5000, this)">၅၀၀၀</button>
+            </div>
+
+            <div class="or-divider">သို့မဟုတ်</div>
+
+            <div class="custom-input-wrapper">
+                <span class="section-label">ငွေလဲနှုန်း ကိုယ်တိုင်ရိုက်ရန်</span>
+                <div class="input-container">
+                    <input type="number" id="rateInput" placeholder="ဥပမာ- ၄၂၀၀" inputmode="decimal"
+                        oninput="updateManualRate(this.value)">
+                    <button id="clearRateBtn" class="clear-input-btn" onclick="clearRate()">✕</button>
+                </div>
             </div>
 
             <div class="results-display">
                 <div class="res-row">
                     <span class="res-label">စုစုပေါင်း ကျသင့်ငွေ</span>
-                    <span class="res-val-primary" id="mmText">၀ သိန်း</span>
+                    <span class="res-val-primary" id="mmText">၀ ကျပ်</span>
                 </div>
                 <div class="res-row">
                     <span class="res-label">USD ဖြင့် တွက်ချက်မှု</span>
@@ -393,6 +466,7 @@
             updateCalculation();
         }
 
+        // Price Functions
         function setQuickPrice(val, btn) {
             document.getElementById('priceInput').value = val;
             document.querySelectorAll('.quick-grid .quick-btn').forEach(b => b.classList.remove('active'));
@@ -400,16 +474,58 @@
             updateCalculation();
         }
 
-        function setRate(rate, btn) {
+        function clearPrice() {
+            document.getElementById('priceInput').value = '';
+            document.querySelectorAll('.quick-grid .quick-btn').forEach(b => b.classList.remove('active'));
+            updateCalculation();
+        }
+
+        // Rate Functions
+        function setQuickRate(rate, btn) {
             selectedRate = rate;
+            // Updated: Set the input box value to match the quick button
+            document.getElementById('rateInput').value = rate;
             document.getElementById('rateInfo').innerText = `1 USD = ${toMyanmarDigits(rate.toLocaleString())} ကျပ်`;
             document.querySelectorAll('.rate-selector .quick-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             updateCalculation();
         }
 
+        function updateManualRate(val) {
+            const rate = parseFloat(val) || 0;
+            if (rate > 0) {
+                selectedRate = rate;
+                document.getElementById('rateInfo').innerText = `1 USD = ${toMyanmarDigits(rate.toLocaleString())} ကျပ်`;
+
+                // Check if manual value matches any quick button to highlight it
+                let matched = false;
+                document.querySelectorAll('.rate-selector .quick-btn').forEach(b => {
+                    if (parseInt(b.innerText.replace(/,/g, '')) === rate) {
+                        b.classList.add('active');
+                        matched = true;
+                    } else {
+                        b.classList.remove('active');
+                    }
+                });
+            }
+            updateCalculation();
+        }
+
+        function clearRate() {
+            document.getElementById('rateInput').value = '';
+            // Reset to first quick rate button as default (4000)
+            const firstBtn = document.querySelector('.rate-selector .quick-btn');
+            setQuickRate(4000, firstBtn);
+        }
+
         function updateCalculation() {
-            const priceVal = parseFloat(document.getElementById('priceInput').value) || 0;
+            const priceInput = document.getElementById('priceInput');
+            document.getElementById('clearPriceBtn').style.display = priceInput.value ? 'flex' : 'none';
+
+            const rateInput = document.getElementById('rateInput');
+            document.getElementById('clearRateBtn').style.display = rateInput.value ? 'flex' : 'none';
+
+            const priceVal = parseFloat(priceInput.value) || 0;
             const totalMMK = priceVal * totalSqft;
             const totalUSD = totalMMK / selectedRate;
 
@@ -487,7 +603,11 @@
             });
         }
 
-        window.onload = renderHistory;
+        // Set initial value for rate input on load
+        window.onload = function () {
+            document.getElementById('rateInput').value = selectedRate;
+            renderHistory();
+        };
     </script>
 
 </body>
